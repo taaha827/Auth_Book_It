@@ -32,7 +32,7 @@ app.use('/user',require('./Routes/users'));
 
 
 //Connection TO Database
-mongoose.connect(process.env.DB_CONNECTION,{useNewUrlParser:true,useUnifiedTopology: true})
+mongoose.connect("mongodb+srv://taaha827:<password>@cluster0-xezp5.mongodb.net/test?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology: true})
 .then(()=>{
     console.log("Connected To Mongo Successfully.");
 })
