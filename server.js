@@ -27,7 +27,6 @@ app.use(express.urlencoded({extended:false}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-
 //Importing the routes for User
 app.use('/user',require('./Routes/users'));
 
@@ -40,4 +39,4 @@ mongoose.connect(process.env.DB_CONNECTION,{useNewUrlParser:true,useUnifiedTopol
 .catch(err => console.log(err));
 
 //Starting the server
-app.listen(8080);
+app.listen(process.env.PORT|| 8080);
