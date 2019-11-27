@@ -1,10 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
+var request  = require('request');
 const { ensure } = require('../config/auth');
+
 // Load User model
 const User = require('../Models/UserCredentials');
-
 const passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 //Defining the local Strategy for passport
 passport.use(new LocalStrategy({ usernameField: 'email' },
@@ -56,7 +57,7 @@ router.post('/updatePassword', (req, res) => {
 // Register
 router.post('/register', (req, res) => {
     //Deconstructing the recieved Object
-    const { email, password, password2 } = req.body;
+    const { email, password, password2,type } = req.body;
     if (!email || !password || !password2) {
         res.status(400).send({ message: 'All fields Not Entered' });
         return;
@@ -86,14 +87,48 @@ router.post('/register', (req, res) => {
             newUserCredentials
                 .save()
                 .then(user => {
-                    res.status(200).send({ message: "User Created Successfully" });
-                    return;
                 })
                 .catch(err => {
-                    res.status(500).send({ message: "Couldnt Save User" });
-                    return;
                 });
-
+                if(type ==="customer"){
+                    request.post("http://localhost:5000/customer/create",{
+                        customer:{
+                            email:email,
+                            firstName:req.body.firstName,
+                            lastName:req.body.lastName,
+                            phone:req.body.phone
+                        }
+                    },(err,eesponse,body)=>{
+                        if (!error && response.statusCode == 200) {
+                            res.status(200).send({ message: "User Created Successfully" });
+                            return;
+                        }
+                        else{
+                        res.status(500).send({ message: "Couldnt Save User" });
+                        return;
+    }
+                    });
+                }
+                else if(type ==="owner"){
+                    request.post("http://localhost:5000/owner/create",{
+                        customer:{
+                            firstName:req.body.firstName,
+                            lastName:req.body.lastName,
+                            phone:req.body.phone,
+                            email:email
+                       
+                        }
+                    },(err,eesponse,body)=>{
+                        if (!error && response.statusCode == 200) {
+                            res.status(200).send({ message: "User Created Successfully" });
+                            return;
+                        }
+                        else{
+                        res.status(500).send({ message: "Couldnt Save User" });
+                        return;
+    }
+                    });
+                }
         }
     });
 
