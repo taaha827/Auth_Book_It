@@ -30,13 +30,12 @@ app.use(flash());
 //Importing the routes for User
 app.use('/user',require('./Routes/users'));
 
-
+console.log("Added Resources");
 //Connection TO Database
-mongoose.connect("mongodb+srv://taaha827:<password>@cluster0-xezp5.mongodb.net/test?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology: true})
+mongoose.connect("mongodb+srv://taaha827:randompassword@cluster0-xezp5.mongodb.net/test?retryWrites=true&w=majority")
 .then(()=>{
     console.log("Connected To Mongo Successfully.");
 })
-.catch(err => console.log(err));
-
+.catch(err =>{console.log("logging ERror"); console.log(err)});
 //Starting the server
 app.listen(process.env.PORT|| 8080);

@@ -16,7 +16,7 @@
     "express-session": "^1.17.0",
     "flash": "^1.1.0",
     "mongoose": "^5.7.12",
-    "nodemon": "^2.0.0",
+    "nodemon": "^2.0.1",
     "passport": "^0.4.0",
     "passport-google": "^0.3.0",
     "passport-google-oauth": "^2.0.0",

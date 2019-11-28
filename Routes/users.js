@@ -56,7 +56,8 @@ router.post('/updatePassword', (req, res) => {
 
 // Register
 router.post('/register', (req, res) => {
-    //Deconstructing the recieved Object
+    //Deconstructing the recieved Object  
+	console.log(req.body);
     const { email, password, password2,type } = req.body;
     if (!email || !password || !password2) {
         res.status(400).send({ message: 'All fields Not Entered' });
@@ -91,39 +92,41 @@ router.post('/register', (req, res) => {
                 .catch(err => {
                 });
                 if(type ==="customer"){
-                    request.post("http://localhost:5000/customer/create",{
-                        customer:{
-                            email:email,
-                            firstName:req.body.firstName,
-                            lastName:req.body.lastName,
-                            phone:req.body.phone
-                        }
-                    },(err,eesponse,body)=>{
-                        if (!error && response.statusCode == 200) {
-                            res.status(200).send({ message: "User Created Successfully" });
+                    request.post(request.post("http://powerful-peak-07170.herokuapp.com/customer/create/",{form:{
+                        firstName:req.body.firstName,
+                        lastName:req.body.lastName,
+                        phone:req.body.phone,
+                        email:email
+                }},(err,response,body)=>{
+                        if (!err && response.statusCode == 200) {
+                            res.status(200).send({ customerId:response.body,message: "User Created Successfully" });
                             return;
                         }
                         else{
                         res.status(500).send({ message: "Couldnt Save User" });
                         return;
     }
-                    });
-                }
+                    
+                }));    
+            }
                 else if(type ==="owner"){
-                    request.post("http://localhost:5000/owner/create",{
-                        customer:{
+                    // Change this address to this while deploying
+                    request.post("http://powerful-peak-07170.herokuapp.com/owner/create/",{form:{
                             firstName:req.body.firstName,
                             lastName:req.body.lastName,
                             phone:req.body.phone,
                             email:email
-                       
-                        }
-                    },(err,eesponse,body)=>{
-                        if (!error && response.statusCode == 200) {
-                            res.status(200).send({ message: "User Created Successfully" });
+                    }},(err,response,body)=>{
+                        if (!err && response.statusCode == 200) {
+                            console.log(response.body);
+                            res.status(200).send({OwnerId:response.body, message: "User Created Successfully" });
                             return;
                         }
                         else{
+                        console.log("ereror");
+                        console.log(err);
+                        console.log("response:");
+                        console.log(response);  
                         res.status(500).send({ message: "Couldnt Save User" });
                         return;
     }
@@ -136,8 +139,7 @@ router.post('/register', (req, res) => {
 
 // Tested
 router.get('/successLogin', (req, res) => {
-    res.status(200).send({ message: "Login Successfull" });
-    return;
+    return res.status(200).send({email:req.user.email});
 });
 
 //Tested
