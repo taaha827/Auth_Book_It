@@ -22,7 +22,8 @@ app.use(
       );
 
 //Body Parser Middle ware To get from the request
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({extended:true}));
+app.use(bodyParser.json());
 // Configuration for Passport
 app.use(passport.initialize());
 app.use(passport.session());

@@ -145,7 +145,7 @@ router.get('/successLogin', (req, res) => {
 //Tested
 router.get('/failedLogin', (req, res) => {
     console.log(req.body);
-    res.status(401).send({ message: "Login Un-Successfull" });
+    res.status(420).json({ message: "Login Un-Successfull" });
     return;
 });
 
@@ -154,6 +154,7 @@ router.get('/failedLogin', (req, res) => {
 // Login
 router.post('/login', (req, res, next) => {
     try {
+        console.log(req.body);
         console.log("In Login Route call passport authenticate");
         passport.authenticate('local', {
             successRedirect: '/user/successLogin/',
