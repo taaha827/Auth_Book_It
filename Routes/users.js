@@ -65,19 +65,22 @@ router.post('/register', (req, res) => {
     }
     //These are format checks need to discusss and just simply add those restrictions
     if (password.length < 6) {
-        res.status(400).send({ message: "Password Does not match Requirements" });
+        // Password Is less then 6 characters
+        res.status(401).send({ message: "Password Does not match Requirements" });
         return;
     }
 
 
     if (password != password2) {
-        res.status(400).send({ message: "Passwords dont match" });
+        // Password Does not match
+        res.status(402).send({ message: "Passwords dont match" });
         return;
     }
     //Checking if there is a user with same email
     User.findOne({ email: email }).then(user => {
         if (user) {
-            res.status(400).send({ message: "Email already exists" });
+            // User Already Exists
+            res.status(403).send({ message: "Email already exists" });
             return;
         } else {
             const newUserCredentials = new User({
@@ -103,7 +106,8 @@ router.post('/register', (req, res) => {
                             return;
                         }
                         else{
-                        res.status(500).send({ message: "Couldnt Save User" });
+                            //User Credential Created Customer Not created
+                        res.status(501).send({ message: "Couldnt Save User" });
                         return;
     }
                     
@@ -123,11 +127,8 @@ router.post('/register', (req, res) => {
                             return;
                         }
                         else{
-                        console.log("ereror");
-                        console.log(err);
-                        console.log("response:");
-                        console.log(response);  
-                        res.status(500).send({ message: "Couldnt Save User" });
+                            //User Credential Created Owner not added in collection 
+                            res.status(502).send({ message: "Couldnt Save User" });
                         return;
     }
                     });
