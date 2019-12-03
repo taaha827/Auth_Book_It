@@ -139,8 +139,9 @@ router.post('/register', (req, res) => {
 });
 
 // Tested
-router.get('/successLogin', (req, res) => {
-    return res.status(200).send({email:req.user.email});
+router.get('/successLogin', async (req, res) => {
+    console.log(req);
+    //return res.status(200).send({email:req.user.email});
 });
 
 //Tested
@@ -152,24 +153,74 @@ router.get('/failedLogin', (req, res) => {
 
 
 
-// Login
-router.post('/login', (req, res, next) => {
+// Login        
+let result={};
+router.post('/login', passport.authenticate('local'), async(req, res) => {
     try {
-        console.log(req.body);
         console.log("In Login Route call passport authenticate");
-        passport.authenticate('local', {
-            successRedirect: '/user/successLogin/',
-            failureRedirect: '/user/failedLogin',
-            failureFlash: false
-        })(req, res, next);
-        console.log("After Passport.authenticate");
+        
+        if(req.user){
+            console.log("found a user");
+            if(req.body.type==="owner"){
+                console.log("got an owner");
+           
+            const onwerId = await gID(req.user.email);
+            const count = await gC(onwerId);
+            console.log(onwerId);
+            console.log(count);
+            return res.status(200).send({email:req.user.email,count:count.count,firstStore:count.storeId});    
+  
+            }
+        }
+ //           request.get({url:"http://localhost:5000/store/getStoreCount/"+json["ownerId"]},(err,res,body)=>{
+   //         result=JSON.parse(body);
+      //      });
+        //});
+        //console.log(result);
+   
+    
+        else{
+            return res.status(200).send({email:req.user.email});
+        }
     }
+    
     catch (err) {
+        console.log(err);
         console.log("Exception");
         return;
     }
 });
-
+let gC=(id)=>{
+    return new Promise(function(resolve, reject){
+        
+      request.get({url:"http://powerful-peak-07170.herokuapp.com/store/getStoreCount/"+id}, function (error, response, body) {
+            if (error) return reject(error);
+            try {
+                // JSON.parse() can throw an exception if not valid JSON
+                const json =JSON.parse(body);
+                resolve({count:json.count,storeId:json.storeId});
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
+let gID = (email)=>{
+    return new Promise(function(resolve, reject){
+        
+        request.get({url:"http://powerful-peak-07170.herokuapp.com/owner/getownerId/"+email}, function (error, response, body) {
+            if (error) return reject(error);
+            try {
+                // JSON.parse() can throw an exception if not valid JSON
+                const json =JSON.parse(body);
+                console.log(json.ownerId); 
+                resolve(json.ownerId);
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
 router.get('/logout', (req, res) => {
     req.logout();
     res.status(200).send("Logged out");
