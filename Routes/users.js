@@ -168,7 +168,12 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             const count = await gC(onwerId);
             console.log(onwerId);
             console.log(count);
-            return res.status(200).send({email:req.user.email,count:count.count,firstStore:count.storeId});    
+            return res.status(200).send({
+                email:req.user.email,
+                count:count.count,
+                firstStore:count.storeId,
+                ownerId:onwerId
+            });    
   
             }
         }
