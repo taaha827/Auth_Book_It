@@ -176,7 +176,6 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             });    
   
             }
-            else{return res.status(200).send({email:req.user.email});
         }
  //           request.get({url:"http://localhost:5000/store/getStoreCount/"+json["ownerId"]},(err,res,body)=>{
    //         result=JSON.parse(body);
