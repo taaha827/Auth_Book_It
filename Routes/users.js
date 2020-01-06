@@ -208,7 +208,7 @@ let gC=(id)=>{
 }
 let getCustomer = (email)=>{
     return new Promise(function(resolve, reject){
-        request.get({url:"http://powerful-peak-07170.herokuapp.com/customer/getCustomer/"+email}, function (error, response, body) {
+        request.get({url:"http://powerful-peak-07170.herokuapp.com/customer/getCustomerObject/"+email}, function (error, response, body) {
             if (error) return reject(error);
             try {
                 // JSON.parse() can throw an exception if not valid JSON
