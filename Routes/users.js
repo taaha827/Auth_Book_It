@@ -176,8 +176,9 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             });    
   
             }
-            else{
-                return res.status(200).send({email:req.user.email});
+            else if(req.body.type==="customer"){
+                const customerObject = await getCustomer(req.user.email);
+                return res.status(200).send(customerObject);
             }
     
         }
@@ -199,6 +200,21 @@ let gC=(id)=>{
                 // JSON.parse() can throw an exception if not valid JSON
                 const json =JSON.parse(body);
                 resolve({count:json.count,storeId:json.storeId});
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
+let getCustomer = (email)=>{
+    return new Promise(function(resolve, reject){
+        request.get({url:"http://powerful-peak-07170.herokuapp.com/customer/getCustomer/"+email}, function (error, response, body) {
+            if (error) return reject(error);
+            try {
+                // JSON.parse() can throw an exception if not valid JSON
+                const json =JSON.parse(body);
+                console.log(json); 
+                resolve(json);
             } catch(e) {
                 reject(e);
             }
