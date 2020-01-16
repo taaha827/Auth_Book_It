@@ -207,6 +207,10 @@ let gC=(id)=>{
         });
     });
 }
+let dummy = ()=>{
+    console.log("hahah")
+}
+
 let getCustomer = (email)=>{
     return new Promise(function(resolve, reject){
         //
