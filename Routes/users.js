@@ -11,6 +11,8 @@ const passport = require('passport'), LocalStrategy = require('passport-local').
 passport.use(new LocalStrategy({ usernameField: 'email' },
     function (email, password, done) {
         try {
+            console.log("In local strategy")
+
             //Finding user through thier email
             User.findOne({ email: email }, function (err, user) {
                 if (err) { return done(err); }
@@ -158,7 +160,6 @@ let result={};
 router.post('/login', passport.authenticate('local'), async(req, res) => {
     try {
         console.log("In Login Route call passport authenticate");
-        
         if(req.user){
             console.log("found a user");
             if(req.body.type==="owner"){
@@ -208,10 +209,12 @@ let gC=(id)=>{
 }
 let getCustomer = (email)=>{
     return new Promise(function(resolve, reject){
+        //
         request.get({url:"http://powerful-peak-07170.herokuapp.com/customer/getCustomerObject/"+email}, function (error, response, body) {
             if (error) return reject(error);
             try {
                 // JSON.parse() can throw an exception if not valid JSON
+                console.log(body)
                 const json =JSON.parse(body);
                 console.log(json); 
                 resolve(json);
