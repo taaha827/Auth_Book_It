@@ -187,7 +187,9 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
     }
     
     catch (err) {
-        console.log(err);
+        if(err==="Did not found user"){
+            return res.status(409).send({message:"Couldn't find owner with given email"})
+        }
         console.log("Exception");
         return;
     }
@@ -217,6 +219,7 @@ let getCustomer = (email)=>{
         request.get({url:"http://powerful-peak-07170.herokuapp.com/customer/getCustomerObject/"+email}, function (error, response, body) {
             if (error) return reject(error);
             try {
+                console.log(response.statusCode )
                 // JSON.parse() can throw an exception if not valid JSON
                 console.log(body)
                 const json =JSON.parse(body);
@@ -234,6 +237,9 @@ let gID = (email)=>{
         request.get({url:"http://powerful-peak-07170.herokuapp.com/owner/getownerId/"+email}, function (error, response, body) {
             if (error) return reject(error);
             try {
+                if(response.statusCode==404){
+                    reject("Did not found user")
+                }
                 // JSON.parse() can throw an exception if not valid JSON
                 const json =JSON.parse(body);
                 console.log(json.ownerId); 
