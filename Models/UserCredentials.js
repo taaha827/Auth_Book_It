@@ -8,6 +8,9 @@ const userCredemtialSchema = mongoose.Schema({
    password:{
        type:String,
        required:true
+   },
+   notificationToken:{
+       type:String
    }
     
 });

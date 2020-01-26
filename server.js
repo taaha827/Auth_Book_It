@@ -4,14 +4,16 @@ const express = require("express");
 const mongoose = require("mongoose");
 // Importing to parse connection string for mongoDB (Security)
 require('dotenv/config');
+//const passport = require('./config/')
+
 //Initializing The Server
 const app = express();
 
 //For Passport Need the following imports
 const passport = require('passport');
 const flash = require('connect-flash');
-var session = require("express-session"),
-    bodyParser = require("body-parser");
+var session = require("express-session")
+let bodyParser = require("body-parser");
 //Initializing for Passport Session Maintainence Not used in our case but is a good practice
 app.use(
         session({

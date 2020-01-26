@@ -1,12 +1,11 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const router = express.Router();
-var request  = require('request');
-const { ensure } = require('../config/auth');
+
 
 // Load User model
 const User = require('../Models/UserCredentials');
 const passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
+const express = require("express");
+const router = express.Router();
+const request = require('request')
 //Defining the local Strategy for passport
 passport.use(new LocalStrategy({ usernameField: 'email' },
     function (email, password, done) {
@@ -163,8 +162,14 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
         if(req.user){
             console.log("found a user");
             if(req.body.type==="owner"){
-                console.log("got an owner");
-           
+            console.log("got an owner");
+            setNotification(req.user.email,'owner',req.body.Token)
+            .then(result=>{
+                console.log(result)
+            })
+            .catch(err=>{console.log(err)})
+
+            User.findOneAndUpdate({email:req.body.email},{notificationToken: req.body.Token})
             const onwerId = await gID(req.user.email);
             const count = await gC(onwerId);
             console.log(onwerId);
@@ -178,6 +183,11 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
   
             }
             else if(req.body.type==="customer"){
+                setNotification(req.user.email,'customer',req.body.Token)
+                .then(result=>{
+                    console.log(result)
+                })
+                .catch(err=>{console.log(err)})
                 const customerObject = await getCustomer(req.user.email);
                 return res.status(200).send(customerObject);
             }
@@ -250,8 +260,50 @@ let gID = (email)=>{
         });
     });
 }
+
+
+
+let setNotification = (email, type, notificationToken)=>{
+    return new Promise(function(resolve, reject){
+        let u = `http://localhost:5000/owner/setNotificationToken/${type}/${email}/${notificationToken}`
+        let u1 = `http://powerful-peak-07170.herokuapp.com/owner/setNotificationToken/${type}/${email}/${notificationToken}`
+        request.get({url:u1}, function (error, response, body) {
+            if (error) return reject(error);
+            try {
+                if(response.statusCode==404){
+                    reject("Notification Not set")
+                }
+                resolve('Notification Set');
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
+let removeNotification = (type, email)=>{
+    return new Promise(function(resolve, reject){
+        let u = `http://localhost:5000/owner/removeNotificationToken/${type}/${email}`
+        let u1 = `http://powerful-peak-07170.herokuapp.com/owner/removeNotificationToken/${type}/${email}`
+        
+        request.get({url:u1}, function (error, response, body) {
+        if (error) return reject(error);
+            try {
+                if(response.statusCode==404){
+                    reject("Notification Not Removed")
+                }
+                resolve('Notification Removed');
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
+
 router.get('/logout', (req, res) => {
-    req.logout();
+    console.log(req.body)
+    removeNotification(req.body.type,req.body.email)
+    .then(result=>{console.log(result)})
+    .catch(err =>{console.log(err)})
     res.status(200).send("Logged out");
 });
 
