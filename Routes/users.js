@@ -47,10 +47,15 @@ passport.deserializeUser(function (id, done) {
 
 //API route for updating Password
 router.post('/updatePassword', (req, res) => {
-    const email = req.email;
-    const password = req.password;
-    User.findOneAndUpdate({ email: email }, { $set: { password: password } }, { upsert: true }, function (err) {
+    const email = req.body.email;
+    const password = req.body.password;
+    User.findOneAndUpdate({ email: email }, { $set: { password: password } }, function (err) {
+    if(err){
         res.status(500).send({ message: "Could Not Update Password" });
+    }else{
+        res.status(200).send({ message: "Password  Updated" });
+
+    }
     });
 
 });
