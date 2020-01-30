@@ -49,14 +49,17 @@ passport.deserializeUser(function (id, done) {
 router.post('/updatePassword', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    User.findOneAndUpdate({ email: email }, { $set: { password: password } }, function (err) {
-    if(err){
-        res.status(500).send({ message: "Could Not Update Password" });
-    }else{
-        res.status(200).send({ message: "Password  Updated" });
-
-    }
-    });
+    User.findOneAndUpdate({ email: email }, { $set: { password: password }},{new:true})
+    .then(result =>{
+        if(!result){
+            return res.status(404).send({message:"User email not found  to update"});
+        }else{
+            return res.status(200).send({message:"Password Updated Successfully"});
+        }
+    })
+    .catch(err=>{
+        return res.status(500).send({message:"Could Not Process Request"});
+    })
 
 });
 
