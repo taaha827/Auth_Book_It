@@ -49,7 +49,7 @@ passport.deserializeUser(function (id, done) {
 router.post('/updatePassword', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    User.findOneAndUpdate({ email: email }, { $set: { password: password }},{new:true})
+    User.findOneAndUpdate({ email: email }, { $set: { password: password }},{returnNewDocument:true})
     .then(result =>{
         if(!result){
             return res.status(404).send({message:"User email not found  to update"});
@@ -177,16 +177,15 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             })
             .catch(err=>{console.log(err)})
 
-            User.findOneAndUpdate({email:req.body.email},{notificationToken: req.body.Token})
             const onwerId = await gID(req.user.email);
-            const count = await gC(onwerId);
-            console.log(onwerId);
-            console.log(count);
+            const count = await gC(onwerId.ownerId);
+            console.log("Returning");
             return res.status(200).send({
                 email:req.user.email,
                 count:count.count,
                 firstStore:count.storeId,
-                ownerId:onwerId
+                ownerId:onwerId.ownerId,
+                owner: onwerId.owner
             });    
   
             }
@@ -208,6 +207,7 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
         if(err==="Did not found user"){
             return res.status(409).send({message:"Couldn't find owner with given email"})
         }
+        console.log(err)
         console.log("Exception");
         return;
     }
@@ -220,6 +220,7 @@ let gC=(id)=>{
             try {
                 // JSON.parse() can throw an exception if not valid JSON
                 const json =JSON.parse(body);
+                console.log('returning GC')
                 resolve({count:json.count,storeId:json.storeId});
             } catch(e) {
                 reject(e);
@@ -260,8 +261,8 @@ let gID = (email)=>{
                 }
                 // JSON.parse() can throw an exception if not valid JSON
                 const json =JSON.parse(body);
-                console.log(json.ownerId); 
-                resolve(json.ownerId);
+                console.log('Retuning GID')
+                resolve(json);
             } catch(e) {
                 reject(e);
             }
@@ -281,6 +282,7 @@ let setNotification = (email, type, notificationToken)=>{
                 if(response.statusCode==404){
                     reject("Notification Not set")
                 }
+                console.log('Resolving')
                 resolve('Notification Set');
             } catch(e) {
                 reject(e);
