@@ -92,7 +92,6 @@ router.post('/register', (req, res) => {
             res.status(403).send({ message: "Email already exists" });
             return;
         } else {
-            if(type === "owner"){
             const newUserCredentials = new User({
                 email,
                 password
@@ -124,7 +123,28 @@ router.post('/register', (req, res) => {
     }
                     });
                 }
-        }
+                else if(type === "customer"){
+                        if(type ==="customer"){
+                            request.post(request.post("http://powerful-peak-07170.herokuapp.com/customer/create/",{form:{
+                                firstName:req.body.firstName,
+                                lastName:req.body.lastName,
+                                phone:req.body.phone,
+                                email:email
+                        }},(err,response,body)=>{
+                                if (!err && response.statusCode == 200) {
+                                    res.status(200).send({ customerId:response.body,message: "User Created Successfully" });
+                                    return;
+                                }
+                                else{
+                                    //User Credential Created Customer Not created
+                                res.status(501).send({ message: "Couldnt Save User" });
+                                return;
+            }
+                            
+                        }));    
+                    }
+                }
+        
     }
     });
 
@@ -172,10 +192,15 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             });    
   
             }
-            else{
-                return res.status(400).send({message:'Unauthorized'})
-            }
-    
+            else if(req.body.type==="customer"){
+                setNotification(req.user.email,'customer',req.body.Token)
+                .then(result=>{
+                    console.log(result)
+                })
+                .catch(err=>{console.log(err)})
+                const customerObject = await getCustomer(req.user.email);
+                return res.status(200).send(customerObject);
+            }    
         }
 
     }
@@ -225,6 +250,24 @@ let gID = (email)=>{
     });
 }
 
+let getCustomer = (email)=>{
+    return new Promise(function(resolve, reject){
+        //
+        request.get({url:"http://powerful-peak-07170.herokuapp.com/customer/getCustomerObject/"+email}, function (error, response, body) {
+            if (error) return reject(error);
+            try {
+                console.log(response.statusCode )
+                // JSON.parse() can throw an exception if not valid JSON
+                console.log(body)
+                const json =JSON.parse(body);
+                console.log(json); 
+                resolve(json);
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
 
 
 let setNotification = (email, type, notificationToken)=>{
