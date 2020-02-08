@@ -179,8 +179,12 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
                 console.log(result)
             })
             .catch(err=>{console.log(err)})
-
             const onwerId = await gID(req.user.email);
+            let payments= await getPayments(onwerId.ownerId);
+            console.log(payments)
+            if(payments.status){
+                payments = []
+            }
             const count = await gC(onwerId.ownerId);
             console.log("Returning");
             return res.status(200).send({
@@ -188,7 +192,8 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
                 count:count.count,
                 firstStore:count.storeId,
                 ownerId:onwerId.ownerId,
-                owner: onwerId.owner
+                owner: onwerId.owner,
+                payments:payments.payments.payments
             });    
   
             }
@@ -230,6 +235,26 @@ let gC=(id)=>{
         });
     });
 }
+let getPayments=(id)=>{
+    return new Promise(function(resolve, reject){
+      let u1= "http://powerful-peak-07170.herokuapp.com/payment/get/"+id
+      let u= "http://localhost:5000/payment/get/"+id
+      request.get({url:u1}, function (error, response, body) {
+            if (error) return reject(error);
+            try {
+                if(response.statusCode==200){
+                    const json =JSON.parse(body);
+                    console.log('returning GC')
+                    resolve({payments:json});
+                }
+                else resolve({status:404})
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
+
 let gID = (email)=>{
     return new Promise(function(resolve, reject){
         
