@@ -6,6 +6,7 @@ const passport = require('passport'), LocalStrategy = require('passport-local').
 const express = require("express");
 const router = express.Router();
 const request = require('request')
+const help = require('./helper.helping')
 //Defining the local Strategy for passport
 passport.use(new LocalStrategy({ usernameField: 'email' },
     function (email, password, done) {
@@ -18,7 +19,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' },
                 if (!user) {
                     return done(null, false, { message: 'Incorrect username.' });
                 }
-
+                console.log(user)
                 //If Password match in future will add to use encryption here
                 if (user.password === password) {
                     return done(null, user);
@@ -171,7 +172,9 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
     try {
         console.log("In Login Route call passport authenticate");
         if(req.user){
+
             console.log("found a user");
+            console.log(req.body.type)
             if(req.body.type==="owner"){
             console.log("got an owner");
             setNotification(req.user.email,'owner',req.body.Token)
@@ -187,17 +190,28 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             }
             const count = await gC(onwerId.ownerId);
             console.log("Returning");
-            return res.status(200).send({
+            const tokenData = await help.signLoginData({
                 email:req.user.email,
                 count:count.count,
                 firstStore:count.storeId,
                 ownerId:onwerId.ownerId,
                 owner: onwerId.owner,
                 payments:payments.payments.payments
+            })
+            // console.log('Token ====>', tokenData);
+            return res.status(200).send({
+                email:req.user.email,
+                count:count.count,
+                firstStore:count.storeId,
+                ownerId:onwerId.ownerId,
+                owner: onwerId.owner,
+                payments:payments.payments.payments,
+                token: tokenData
             });    
   
             }
             else if(req.body.type==="customer"){
+
                 setNotification(req.user.email,'customer',req.body.Token)
                 .then(result=>{
                     console.log(result)
@@ -332,8 +346,7 @@ let removeNotification = (type, email)=>{
     });
 }
 
-router.get('/logout', (req, res) => {
-    console.log(req.body)
+router.post('/logout', (req, res) => {
     removeNotification(req.body.type,req.body.email)
     .then(result=>{console.log(result)})
     .catch(err =>{console.log(err)})

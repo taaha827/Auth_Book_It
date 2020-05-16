@@ -1,0 +1,43 @@
+{
+    "db": {
+      "development": {
+        "username": "root",
+        "password": "locopixel",
+        "host": "knp-data.centralindia.azurecontainer.io",
+        "port": 3306,
+        "database": "knp-dev2"
+      },
+      "testing": {
+        "username": "",
+        "password": "",
+        "host": "",
+        "port": 2701,
+        "database": ""
+      },
+      "staging": {
+        "username": "",
+        "password": "",
+        "host": "",
+        "port": 2701,
+        "database": ""
+      },
+      "production": {
+        "username": "root",
+        "password": "locopixel",
+        "host": "knp-data.centralindia.azurecontainer.io",
+        "port": 3306,
+        "database": "knp-dev2"
+      }
+    },
+    "FORCE_DB_SYNC": "false",
+    "jwtOptions": {
+      "secretOrKey": "boilerplate",
+      "ignoreExpiration": true,
+      "passReqToCallback": true
+    },
+    "awsConfig": {
+      "accessKeyId": "",
+      "secretAccessKey": "",
+      "region": ""
+    }
+  }
