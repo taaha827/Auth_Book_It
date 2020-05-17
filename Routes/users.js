@@ -190,7 +190,14 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             }
             const count = await gC(onwerId.ownerId);
             console.log("Returning");
-          
+            const tokenData = await help.signLoginData({
+                email:req.user.email,
+                count:count.count,
+                firstStore:count.storeId,
+                ownerId:onwerId.ownerId,
+                owner: onwerId.owner,
+                payments:payments.payments.payments
+            })
             // console.log('Token ====>', tokenData);
             return res.status(200).send({
                 email:req.user.email,
@@ -226,7 +233,7 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
                     })
                     return res.status(200).send({
                         customerInfo : customerObject.ownerId,
-                        token: tokenData
+                        token:tokenData
 
                     });
                 }
