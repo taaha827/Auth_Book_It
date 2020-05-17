@@ -190,14 +190,7 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             }
             const count = await gC(onwerId.ownerId);
             console.log("Returning");
-            const tokenData = await help.signLoginData({
-                email:req.user.email,
-                count:count.count,
-                firstStore:count.storeId,
-                ownerId:onwerId.ownerId,
-                owner: onwerId.owner,
-                payments:payments.payments.payments
-            })
+          
             // console.log('Token ====>', tokenData);
             return res.status(200).send({
                 email:req.user.email,
@@ -212,13 +205,32 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
             }
             else if(req.body.type==="customer"){
 
-                setNotification(req.user.email,'customer',req.body.Token)
-                .then(result=>{
-                    console.log(result)
-                })
-                .catch(err=>{console.log(err)})
+              
                 const customerObject = await getCustomer(req.user.email);
-                return res.status(200).send(customerObject);
+                    console.log('Customer OBject =====>')
+                if(customerObject.message != undefined){
+                    return res.status(403).send({message:'Unauthorized'})
+                }else {
+                    setNotification(req.user.email,'customer',req.body.Token)
+                    .then(result=>{
+                        
+                        console.log(result)
+                    })
+                    .catch(err=>{console.log(err)})
+                    console.log(customerObject)
+                    const tokenData = await help.signLoginData({
+                        email:req.user.email,
+                        firstName:customerObject.firstName,
+                        lastName:customerObject.lastName,
+                        phone:customerObject.phone,
+                    })
+                    return res.status(200).send({
+                        customerInfo : customerObject.ownerId,
+                        token: tokenData
+
+                    });
+                }
+     
             }    
         }
 
