@@ -231,11 +231,8 @@ router.post('/login', passport.authenticate('local'), async(req, res) => {
                         lastName:customerObject.lastName,
                         phone:customerObject.phone,
                     })
-                    return res.status(200).send({
-                        customerInfo : customerObject.ownerId,
-                        token:tokenData
-
-                    });
+                    customerObject.token = tokenData
+                    return res.status(200).send(customerObject);
                 }
      
             }    
